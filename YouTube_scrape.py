@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from googleapiclient.discovery import build
+from constants import API_KEY
 
 # Set up the API credentials
 # creds, project_id = google.auth.default()
-api_key = 'AIzaSyDIGi4QHYWp61QNlWYH7zOmohBM0I1wFqA'
-youtube = build('youtube', 'v3', developerKey=api_key)
+youtube = build('youtube', 'v3', developerKey=API_KEY)
 
 # Specify the video ID
 # video_id = 'lOg1yv8suZM'
