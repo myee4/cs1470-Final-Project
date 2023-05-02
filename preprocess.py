@@ -8,8 +8,11 @@ import collections
 from tqdm import tqdm
 import requests
 from io import BytesIO
+import pandas as pd
+import datetime
+import time
 
-def preprocess_words(titles, tags, max_window_size):
+def preprocess_words(titles, tags, max_window_size=50):
     words_lists = tf.concat([tags, titles], axis = 1)
     for i, words in enumerate(words_lists):
         # Taken from:
@@ -36,141 +39,92 @@ def get_images_from_url(images):
         images[i] = np.asarray(img.getdata())
 
 
-
-images = [r'https://i.ytimg.com/vi/6E1-TDC71KQ/default.jpg', r'https://i.ytimg.com/vi/vlzCnNngyq0/default.jpg']
-get_images_from_url(images)
-print(images)
-# def get_image_features(image_names, data_folder, vis_subset=100):
-#     '''
-#     Method used to extract the features from the images in the dataset using ResNet50
-#     '''
-#     image_features = []
-#     vis_images = []
-#     resnet = tf.keras.applications.ResNet50(False)  ## Produces Bx7x7x2048
-#     gap = tf.keras.layers.GlobalAveragePooling2D()  ## Produces Bx2048
-#     pbar = tqdm(image_names)
-#     for i, image_name in enumerate(pbar):
-#         img_path = f'{data_folder}/Images/{image_name}'
-#         pbar.set_description(f"[({i+1}/{len(image_names)})] Processing '{img_path}' into 2048-D ResNet GAP Vector")
-#         with Image.open(img_path) as img:
-#             img_array = np.array(img.resize((224,224)))
-#         img_in = tf.keras.applications.resnet50.preprocess_input(img_array)[np.newaxis, :]
-#         image_features += [gap(resnet(img_in))]
-#         if i < vis_subset:
-#             vis_images += [img_array]
-#     print()
-#     return image_features, vis_images
+def get_num_from_date(dates):
+    for i, date in enumerate(dates):
+        utc_date = datetime.datetime.fromisoformat(date).replace(tzinfo=datetime.timezone.utc)
+        unix_timestamp = int(utc_date.timestamp())
+        dates[i] = unix_timestamp
 
 
-# def load_data(data_folder):
-#     '''
-#     Method that was used to preprocess the data in the data.p file. You do not need 
-#     to use this method, nor is this used anywhere in the assignment. This is the method
-#     that the TAs used to pre-process the Flickr 8k dataset and create the data.p file 
-#     that is in your assignment folder. 
+def load_data(data_file):
+    view_data = pd.read_csv(data_file)
+    X = view_data.copy()
+    ids = X['video_id']
+    num_in = int(ids.shape[0])
+    indices = tf.random.shuffle(range(num_in))
+    ids = tf.gather(ids, indices)
+    thumbnails = get_images_from_url(X['thumbnail_link'])
+    thumbnails = tf.gather(thumbnails, indices)
+    dates = get_num_from_date(X['publishedAt'])
+    dates = tf.gather(dates, indices)
+    likes = tf.gather(X['likes'], indices)
+    views = tf.gather(X['view_count'], indices)
+    text = preprocess_words(X['title'], X['tags'], 50) # window of 50
+    text = tf.gather(text, indices)
+    train_num = int( 0.7 * num_in)
+    train_text = text[:train_num]
+    test_text = text[train_num:]
+    word_count = collections.Counter()
+    for words in train_text:
+        word_count.update(words)
 
-#     Feel free to ignore this, but please read over this if you want a little more clairity 
-#     on how the images and captions were pre-processed 
-#     '''
-#     text_file_path = f'{data_folder}/captions.txt'
+    def unk_text(texts, minimum_frequency):
+        for text in texts:
+            for index, word in enumerate(text):
+                if word_count[word] <= minimum_frequency:
+                    caption[index] = '<unk>'
 
-#     with open(text_file_path) as file:
-#         examples = file.read().splitlines()[1:]
+    unk_text(train_text, 50)
+    unk_text(test_text, 50)
+
+    # pad captions so they all have equal length
+    def pad_captions(captions, max_window_size = 50):
+        for caption in captions:
+            caption += (max_window_size + 1 - len(caption)) * ['<pad>'] 
     
-#     #map each image name to a list containing all 5 of its captons
-#     image_names_to_captions = {}
-#     for example in examples:
-#         img_name, caption = example.split(',', 1)
-#         image_names_to_captions[img_name] = image_names_to_captions.get(img_name, []) + [caption]
 
-#     #randomly split examples into training and testing sets
-#     shuffled_images = list(image_names_to_captions.keys())
-#     random.seed(0)
-#     random.shuffle(shuffled_images)
-#     test_image_names = shuffled_images[:1000]
-#     train_image_names = shuffled_images[1000:]
+    pad_captions(train_text)
+    pad_captions(test_text)
 
-#     def get_all_captions(image_names):
-#         to_return = []
-#         for image in image_names:
-#             captions = image_names_to_captions[image]
-#             for caption in captions:
-#                 to_return.append(caption)
-#         return to_return
-
-
-#     # get lists of all the captions in the train and testing set
-#     train_captions = get_all_captions(train_image_names)
-#     test_captions = get_all_captions(test_image_names)
-
-#     #remove special charachters and other nessesary preprocessing
-#     window_size = 20
-#     preprocess_captions(train_captions, window_size)
-#     preprocess_captions(test_captions, window_size)
-
-#     # count word frequencies and replace rare words with '<unk>'
-#     word_count = collections.Counter()
-#     for caption in train_captions:
-#         word_count.update(caption)
-
-#     def unk_captions(captions, minimum_frequency):
-#         for caption in captions:
-#             for index, word in enumerate(caption):
-#                 if word_count[word] <= minimum_frequency:
-#                     caption[index] = '<unk>'
-
-#     unk_captions(train_captions, 50)
-#     unk_captions(test_captions, 50)
-
-#     # pad captions so they all have equal length
-#     def pad_captions(captions, window_size):
-#         for caption in captions:
-#             caption += (window_size + 1 - len(caption)) * ['<pad>'] 
-    
-#     pad_captions(train_captions, window_size)
-#     pad_captions(test_captions,  window_size)
-
-#     # assign unique ids to every work left in the vocabulary
-#     word2idx = {}
-#     vocab_size = 0
-#     for caption in train_captions:
-#         for index, word in enumerate(caption):
-#             if word in word2idx:
-#                 caption[index] = word2idx[word]
-#             else:
-#                 word2idx[word] = vocab_size
-#                 caption[index] = vocab_size
-#                 vocab_size += 1
-#     for caption in test_captions:
-#         for index, word in enumerate(caption):
-#             caption[index] = word2idx[word] 
-    
-#     # use ResNet50 to extract image features
-#     print("Getting training embeddings")
-#     train_image_features, train_images = get_image_features(train_image_names, data_folder)
-#     print("Getting testing embeddings")
-#     test_image_features,  test_images  = get_image_features(test_image_names, data_folder)
-
-#     return dict(
-#         train_captions          = np.array(train_captions),
-#         test_captions           = np.array(test_captions),
-#         train_image_features    = np.array(train_image_features),
-#         test_image_features     = np.array(test_image_features),
-#         train_images            = np.array(train_images),
-#         test_images             = np.array(test_images),
-#         word2idx                = word2idx,
-#         idx2word                = {v:k for k,v in word2idx.items()},
-#     )
+    # assign unique ids to every word left in the vocabulary
+    word2idx = {}
+    vocab_size = 0
+    for caption in train_text:
+        for index, word in enumerate(caption):
+            if word in word2idx:
+                caption[index] = word2idx[word]
+            else:
+                word2idx[word] = vocab_size
+                caption[index] = vocab_size
+                vocab_size += 1
+    for caption in test_text:
+        for index, word in enumerate(caption):
+            caption[index] = word2idx[word] 
+    return dict(
+        train_text          = np.array(train_text),
+        test_text           = np.array(test_text),
+        train_views          = np.array(views[:train_num]),
+        test_views           = np.array(views[train_num:]),
+        train_likes          = np.array(likes[:train_num]),
+        test_likes           = np.array(likes[train_num:]),
+        train_dates          = np.array(dates[:train_num]),
+        test_dates           = np.array(dates[train_num:]),
+        train_images    = np.array(thumbnails[:train_num]),
+        test_images     = np.array(thumbnails[train_num:]),
+        word2idx                = word2idx,
+        idx2word                = {v:k for k,v in word2idx.items()},
+    )
 
 
-# def create_pickle(data_folder):
-#     with open(f'{data_folder}/data.p', 'wb') as pickle_file:
-#         pickle.dump(load_data(data_folder), pickle_file)
-#     print(f'Data has been dumped into {data_folder}/data.p!')
+def create_pickle(data_folder, data_file):
+    with open(f'{data_folder}/useable_data.p', 'wb') as pickle_file:
+        pickle.dump(load_data(data_file), pickle_file)
+    print(f'Data has been dumped into {data_folder}/useable_data.p!')
 
 
-# if __name__ == '__main__':
-#     ## Download this and put the Images and captions.txt indo your ../data directory
-#     ## Flickr 8k Dataset: https://www.kaggle.com/datasets/adityajn105/flickr8k?resource=download
-#     data_folder = '../data'
-#     create_pickle(data_folder)
+if __name__ == '__main__':
+    ## Download this and put the Images and captions.txt indo your ../data directory
+    ## Flickr 8k Dataset: https://www.kaggle.com/datasets/adityajn105/flickr8k?resource=download
+    data_file = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\kaggle_data\US_youtube_trending_data.csv'
+    data_folder = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\kaggle_data'
+    create_pickle(data_folder, data_file)
