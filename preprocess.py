@@ -26,7 +26,7 @@ def preprocess_words(titles, tags, max_window_size=50):
         clean_text = [word for word in text_nopunct.split() if ((len(word) > 1) and (word.isalpha()))]
       
         # Join those words into a string
-        words_new = ['<start>'] + clean_text[:max_window_size-1] + ['<end>']
+        words_new = ['<start>'] + clean_text[:max_window_size-1] + ['<end>']# used to be -1
       
         # Replace the old caption in the captions list with this new cleaned caption
         texts_lists[i] = words_new
@@ -38,7 +38,7 @@ def get_images_from_url(images):
     for i, url in enumerate(images):
         img_data = requests.get(url).content
         img = Image.open(BytesIO(img_data))
-        image_lists[i] = np.asarray(img.getdata())
+        image_lists[i] = np.asarray(img.getdata(), dtype = np.float32).reshape(120,90,3)
     return image_lists
 
 def get_num_from_date(dates):
@@ -55,13 +55,14 @@ def load_data(data_file):
     X = view_data.copy()
     ids = X['video_id']
     num_in = int(ids.shape[0])
-    indices = tf.random.shuffle(range(num_in))
+    # indices = tf.random.shuffle(range(num_in))
     #ids = np.take(ids, indices)
     thumbnails = get_images_from_url(X['thumbnail_link'])
     #thumbnails = np.take(thumbnails, indices)
     dates = get_num_from_date(X['publishedAt'])
     # dates = np.take(dates, indices)
     likes = X['likes']
+    numbers = np.concatenate([tf.expand_dims(dates, axis =1), tf.expand_dims(likes, axis =1)], axis = 1)
     # likes = np.take(likes], indices)
     views = X['view_count']
     # views = np.take(views , indices)
@@ -86,7 +87,7 @@ def load_data(data_file):
     # pad captions so they all have equal length
     def pad_captions(captions, max_window_size = 50):
         for caption in captions:
-            caption += (max_window_size + 1 - len(caption)) * ['<pad>'] 
+            caption += (max_window_size + 1 - len(caption)) * ['<pad>'] #used to be +1
     
 
     pad_captions(train_text)
@@ -111,10 +112,12 @@ def load_data(data_file):
         test_text           = np.array(test_text),
         train_views          = np.array(views[:train_num]),
         test_views           = np.array(views[train_num:]),
-        train_likes          = np.array(likes[:train_num]),
-        test_likes           = np.array(likes[train_num:]),
-        train_dates          = np.array(dates[:train_num]),
-        test_dates           = np.array(dates[train_num:]),
+        # train_likes          = np.array(likes[:train_num]),
+        # test_likes           = np.array(likes[train_num:]),
+        # train_dates          = np.array(dates[:train_num]),
+        # test_dates           = np.array(dates[train_num:]),
+        train_nums             = np.array(numbers[:train_num]),
+        test_nums             = np.array(numbers[train_num:]),
         train_images    = np.array(thumbnails[:train_num]),
         test_images     = np.array(thumbnails[train_num:]),
         word2idx                = word2idx,
