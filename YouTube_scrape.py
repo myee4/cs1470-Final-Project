@@ -16,7 +16,7 @@ video_ids = ['lOg1yv8suZM', '5TCGXyHzSSc', 'oave4Z939as']
 
 # # Call the videos().list method to retrieve information about each video
 
-#USE FOR SEARCHING FOR VIDS
+# USE FOR SEARCHING FOR VIDEOS
 # search_response = youtube.search().list(
 #     part='id',
 #     q='gaming',
@@ -24,7 +24,8 @@ video_ids = ['lOg1yv8suZM', '5TCGXyHzSSc', 'oave4Z939as']
 #     maxResults=500
 # ).execute()
 
-max_results = 50 #not sure why but this hates going over 50
+# Not sure why but this hates going over 50
+max_results = 50
 
 # Retrieve a list of videos sorted by date published
 search_response = youtube.search().list(
@@ -34,16 +35,16 @@ search_response = youtube.search().list(
     maxResults=max_results
 ).execute()
 
-
-# THIS TOO FOR SEARCHING
+# THIS TOO IS FOR SEARCHING
 # Extract video IDs from the search response
 video_ids = [item['id']['videoId'] for item in search_response['items']]
 
 videos_response = youtube.videos().list(
     part='snippet,statistics',
-    id=','.join(video_ids) #change to video_ids if want more
+    id=','.join(video_ids) # change to video_ids if you want to do more
 ).execute()
 count = 1
+
 # Iterate over the video responses to extract the desired information
 for video in videos_response['items']:
     # Extract video information
@@ -60,7 +61,6 @@ for video in videos_response['items']:
     part='statistics'
     ).execute()
     subscriber_count = channel_response['items'][0]['statistics']['subscriberCount']
-
 
     # Print the extracted information
     print(f'Video ID: {video_id}')
