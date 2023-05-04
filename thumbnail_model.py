@@ -2,13 +2,13 @@ import tensorflow as tf
 
 class ThumbnailModel(tf.keras.Model):
 
-    def __init__(self, hidden_size, filter_size, embed_size, vocab_size, max_win):
+    def __init__(self, hidden_size, filter_size, embed_size, vocab_size, max_window_size):
         super().__init__()
         self.hidden_size = hidden_size
         self.filter_num = filter_size
         self.embed_size = embed_size
         self.vocab_size = vocab_size
-        self.max_win = max_win
+        self.max_window_size = max_window_size
         self.optimizer = tf.keras.optimizers.Adam()
         self.image_arch = tf.keras.Sequential(
             layers = [
@@ -48,12 +48,15 @@ class ThumbnailModel(tf.keras.Model):
         self.feed_forward = tf.keras.Sequential(
             layers = [
                 tf.keras.layers.BatchNormalization(),
-                tf.keras.layers.Dense(self.hidden_size),
+                tf.keras.layers.Dense(4096),
                 tf.keras.layers.LeakyReLU(),
+                tf.keras.layers.Dropout(0.5),
+                tf.keras.layers.Dense(1000),
+                tf.keras.layers.ReLU(),
                 tf.keras.layers.Dense(1),
-                # tf.keras.layers.ReLU()
+                # tf.keras.layers.Softmax()
             ])
-        self.embed_layer = tf.keras.layers.Embedding(input_dim = self.vocab_size, output_dim=self.embed_size, trainable = True, input_length=self.max_win)
+        self.embed_layer = tf.keras.layers.Embedding(input_dim = self.vocab_size, output_dim=self.embed_size, trainable = True, input_length=self.max_window_size)
 
     def call(self, images, texts, numbers):
         # images = tf.cast(images, tf.int32)

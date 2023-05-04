@@ -7,9 +7,7 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size =
     num_batches = int(len(train_images) / batch_size)
     total_loss = 0
     total_acc = 0
-    # batching is not happening right now
-    # for (b_image, b_text, b_nums, b_views) in zip(train_images, train_text, train_nums, train_views):
-    for index, end in enumerate(range(batch_size, len(train_images)+1, batch_size)):
+    for _, end in enumerate(range(batch_size, len(train_images)+1, batch_size)):
         start = end - batch_size
         batch_images = train_images[start:end, :]
         batch_text = train_text[start:end, :]
@@ -46,7 +44,7 @@ def main():
     train_views  = np.array(data_dict['train_views'])
     test_views   = np.array(data_dict['test_views'])
     word2idx        = data_dict['word2idx']
-    model = ThumbnailModel(128, 11, 32, len(word2idx), 50) # FROM PREPROCESS THIS IS BAD
+    model = ThumbnailModel(128, 5, 32, len(word2idx), 50)
     epochs = 30
     for _ in range(epochs):
         print("-------------------------------------------------------")
