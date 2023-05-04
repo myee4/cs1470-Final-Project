@@ -12,6 +12,9 @@ samples
 samples/
 ../samples
 
+# any pickled files
+*.p
+
 # MacOS
 .DS_Store
 ./DS_Store
