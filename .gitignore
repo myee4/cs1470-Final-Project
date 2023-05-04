@@ -7,6 +7,10 @@ test/
 validate/
 ./test
 ./validate
+./samples
+samples
+samples/
+../samples
 
 # MacOS
 .DS_Store
