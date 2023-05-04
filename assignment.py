@@ -89,7 +89,7 @@ def main():
     train_views  = np.array(data_dict['train_views'])
     test_views   = np.array(data_dict['test_views'])
     word2idx        = data_dict['word2idx']
-    model = ThumbnailModel(128, 16, 32, len(word2idx), 50) #FROM PREPROCESS THIS IS BAD
+    model = ThumbnailModel(128, 11, 32, len(word2idx), 50) #FROM PREPROCESS THIS IS BAD
     epochs = 30
     for epoch in range(epochs):
         print("-------------------------------------------------------")

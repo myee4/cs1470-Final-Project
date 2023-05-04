@@ -14,13 +14,25 @@ class ThumbnailModel(tf.keras.Model):
         self.image_arch = tf.keras.Sequential(
             layers = [
                 # tf.keras.layers.Reshape((120, 90, 3)),
-                tf.keras.layers.Conv2D(self.filter_num, 3, padding = "SAME"),
-                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(self.filter_num, 4, padding = "SAME"),
                 tf.keras.layers.LeakyReLU(),
-                tf.keras.layers.MaxPool2D(padding = "SAME"),
-                tf.keras.layers.Conv2D(1, 3, padding = "SAME"),
-                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.MaxPool2D(padding = "SAME", pool_size=(3, 3), strides=2),
+
+
+                tf.keras.layers.Conv2D(5, 1, padding = "SAME"),
                 tf.keras.layers.LeakyReLU(),
+                tf.keras.layers.MaxPool2D(padding = "SAME", pool_size=(3, 3), strides=2),
+
+                tf.keras.layers.Conv2D(3, 1, padding = "SAME"),
+                tf.keras.layers.LeakyReLU(),
+
+                tf.keras.layers.Conv2D(3, 1, padding = "SAME"),
+                tf.keras.layers.LeakyReLU(),
+
+                tf.keras.layers.Conv2D(1, 1, padding = "SAME"),
+                tf.keras.layers.LeakyReLU(),
+                
+                tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Flatten()
             ])
         self.text_arch = tf.keras.Sequential(
