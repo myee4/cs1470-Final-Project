@@ -134,6 +134,6 @@ def create_pickle(data_folder, data_file):
 if __name__ == '__main__':
     ## Download this and put the Images and captions.txt indo your ../data directory
     ## Flickr 8k Dataset: https://www.kaggle.com/datasets/adityajn105/flickr8k?resource=download
-    data_file = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\kaggle_data\sample_trending_data.csv'
-    data_folder = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\kaggle_data'
+    data_file = r'./kaggle_data/sample_trending_data.csv'
+    data_folder = './kaggle_data'
     create_pickle(data_folder, data_file)

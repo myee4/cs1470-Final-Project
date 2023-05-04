@@ -77,7 +77,7 @@ def test(model, test_images, test_text, test_nums, test_views):
 
 
 def main():
-    file_path = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\kaggle_data\useable_data.p'
+    file_path = './kaggle_data/useable_data.p'
     with open(file_path, 'rb') as data_file:
         data_dict = pickle.load(data_file)
     train_images  = np.array(data_dict['train_images'])
