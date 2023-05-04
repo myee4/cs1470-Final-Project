@@ -16,23 +16,19 @@ def preprocess_words(titles, tags, max_window_size=50):
     # words_lists = np.concatenate([[tags], np.asarray(np.expand_dims(titles, axis = 1)).T], axis = 1)
     texts_lists = [None] * titles.shape[0]
     for i,  (tag, title) in enumerate(zip(tags, titles)):
-        # Taken from:
-        # https://towardsdatascience.com/image-captions-with-attention-in-tensorflow-step-by-step-927dad3569fa
+        # Source: https://towardsdatascience.com/image-captions-with-attention-in-tensorflow-step-by-step-927dad3569fa
         single_text = tag + " " + title
         # Convert the caption to lowercase, and then remove all special characters from it
         text_nopunct = re.sub(r"[^a-zA-Z0-9]+", ' ', single_text.lower())
         # Split the caption into separate words, and collect all words which are more than 
         # one character and which contain only alphabets (ie. discard words with mixed alpha-numerics)
         clean_text = [word for word in text_nopunct.split() if ((len(word) > 1) and (word.isalpha()))]
-      
         # Join those words into a string
         words_new = ['<start>'] + clean_text[:max_window_size-1] + ['<end>']# used to be -1
-      
         # Replace the old caption in the captions list with this new cleaned caption
         texts_lists[i] = words_new
     return texts_lists
     
-
 def get_images_from_url(images):
     image_lists = [None] * images.shape[0]
     for i, url in enumerate(images):
@@ -56,9 +52,9 @@ def load_data(data_file):
     ids = X['video_id']
     num_in = int(ids.shape[0])
     # indices = tf.random.shuffle(range(num_in))
-    #ids = np.take(ids, indices)
+    # ids = np.take(ids, indices)
     thumbnails = get_images_from_url(X['thumbnail_link'])
-    #thumbnails = np.take(thumbnails, indices)
+    # thumbnails = np.take(thumbnails, indices)
     dates = get_num_from_date(X['publishedAt'])
     # dates = np.take(dates, indices)
     likes = X['likes']
@@ -89,7 +85,6 @@ def load_data(data_file):
         for caption in captions:
             caption += (max_window_size + 1 - len(caption)) * ['<pad>'] #used to be +1
     
-
     pad_captions(train_text)
     pad_captions(test_text)
 
@@ -124,16 +119,12 @@ def load_data(data_file):
         idx2word                = {v:k for k,v in word2idx.items()},
     )
 
-
 def create_pickle(data_folder, data_file):
     with open(f'{data_folder}/useable_data.p', 'wb') as pickle_file:
         pickle.dump(load_data(data_file), pickle_file)
     print(f'Data has been dumped into {data_folder}/useable_data.p!')
 
-
 if __name__ == '__main__':
-    ## Download this and put the Images and captions.txt indo your ../data directory
-    ## Flickr 8k Dataset: https://www.kaggle.com/datasets/adityajn105/flickr8k?resource=download
-    data_file = r'./kaggle_data/sample_trending_data.csv'
-    data_folder = './kaggle_data'
+    data_file = r'./kaggle_data/one_data_to_rule_them_all.csv'
+    data_folder = r'./kaggle_data'
     create_pickle(data_folder, data_file)
