@@ -31,6 +31,7 @@ class ThumbnailModel(tf.keras.Model):
 
                 tf.keras.layers.Conv2D(1, 1, padding = "SAME"),
                 tf.keras.layers.LeakyReLU(),
+                tf.keras.layers.MaxPool2D(padding = "SAME", pool_size=(3, 3), strides=2),
                 
                 tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Flatten()
