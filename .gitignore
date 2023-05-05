@@ -1,17 +1,3 @@
-# Data files
-./data
-data
-data/
-../data
-test/
-validate/
-./test
-./validate
-./samples
-samples
-samples/
-../samples
-
 # any pickled files
 *.p
 
