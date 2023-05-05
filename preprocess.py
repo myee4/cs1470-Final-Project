@@ -10,18 +10,21 @@ from PIL import Image
 from io import BytesIO
 import tensorflow as tf
 
-
 '''
 preprocess_images() takes in a list of links to thumbnails of YouTube videos
 and retrieves the thumbnails from the links at which they are stored.
 '''
+
+
 def preprocess_images(thumbnail_urls):
     preprocessed_images = [None] * thumbnail_urls.shape[0]
     for i, url in enumerate(thumbnail_urls):
         image_data = requests.get(url).content
         image = Image.open(BytesIO(image_data))
-        preprocessed_images[i] = np.asarray(image.getdata(), dtype = np.float32).reshape(120, 90, 3)
+        preprocessed_images[i] = np.asarray(
+            image.getdata(), dtype=np.float32).reshape(120, 90, 3)
     return preprocessed_images
+
 
 '''
 preprocess_text() takes in the titles of videos as well as the hashtags associated
@@ -30,28 +33,38 @@ strings of length window_size. The decision to add the hashtags before video tit
 was arbitrary. This does imply that for videos with lots of hashtags or longer video
 titles, the title will be truncated (first).
 '''
-def preprocess_text(titles, hashtags, window_size = 50):
+
+
+def preprocess_text(titles, hashtags, window_size=50):
     preprocessed_text = [None] * titles.shape[0]
     for i, (hashtag, title) in enumerate(zip(hashtags, titles)):
         text_old_format = hashtag + " " + title
-        text_unformatted = re.sub(r"[^a-zA-Z0-9]+", ' ', text_old_format.lower())
-        text_unformatted = [word for word in text_unformatted.split() if ((len(word) > 1) and (word.isalpha()))]
-        text_new_format = ['<start>'] + text_unformatted[:window_size-1] + ['<end>']
+        text_unformatted = re.sub(
+            r"[^a-zA-Z0-9]+", ' ', text_old_format.lower())
+        text_unformatted = [word for word in text_unformatted.split() if (
+            (len(word) > 1) and (word.isalpha()))]
+        text_new_format = ['<start>'] + \
+            text_unformatted[:window_size-1] + ['<end>']
         preprocessed_text[i] = text_new_format
     return preprocessed_text
+
 
 '''
 preprocess_dates() takes in a list of the dates on which videos were published and
 converts that information to a standardized format.
 '''
+
+
 def preprocess_dates(dates):
     preprocessed_dates = [None] * dates.shape[0]
     for i, date in enumerate(dates):
         iso_date = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
-        utc_date = datetime.datetime.fromisoformat(str(iso_date)).replace(tzinfo=datetime.timezone.utc)
+        utc_date = datetime.datetime.fromisoformat(
+            str(iso_date)).replace(tzinfo=datetime.timezone.utc)
         unix_timestamp = int(utc_date.timestamp())
         preprocessed_dates[i] = unix_timestamp
     return preprocessed_dates
+
 
 '''
 preprocess_data() takes in the number of data points a user wants to use to train their 
@@ -59,18 +72,22 @@ model and their desired train-test data split. It then reads that data from a cs
 containing data on 200,000 YouTube videos, and then stores all the relevant data as a 
 dictionary in a pickle file.
 '''
+
+
 def preprocess_data(desired_range, desired_split):
     # data: https://www.kaggle.com/datasets/rsrishav/youtube-trending-video-dataset/versions/1000
     data_file = r'./data/one_data_to_rule_them_all.csv'
     specific_rows = [i for i in range(desired_range)]
-    specific_data = pd.read_csv(data_file, skiprows = lambda x: x not in specific_rows)
+    specific_data = pd.read_csv(
+        data_file, skiprows=lambda x: x not in specific_rows)
 
     text = preprocess_text(specific_data['title'], specific_data['tags'])
     thumbnails = preprocess_images(specific_data['thumbnail_link'])
     dates = preprocess_dates(specific_data['publishedAt'])
     likes = specific_data['likes']
     views = specific_data['view_count']
-    numbers = np.concatenate([tf.expand_dims(dates, axis = 1), tf.expand_dims(likes, axis = 1)], axis = 1)
+    numbers = np.concatenate(
+        [tf.expand_dims(dates, axis=1), tf.expand_dims(likes, axis=1)], axis=1)
 
     ids = specific_data['video_id']
     num_samples = int(ids.shape[0])
@@ -86,20 +103,21 @@ def preprocess_data(desired_range, desired_split):
             for index, word in enumerate(text):
                 if word_count[word] <= minimum_frequency:
                     text[index] = '<unk>'
-    
+
     unk_text(train_text, 10)
     unk_text(test_text, 10)
 
-    def pad_captions(captions, window_size = 50):
+    def pad_captions(captions, window_size=50):
         for caption in captions:
-            caption += (window_size + 1 - len(caption)) * ['<pad>'] #used to be +1
-    
+            caption += (window_size + 1 - len(caption)) * \
+                ['<pad>']
+
     pad_captions(train_text)
     pad_captions(test_text)
 
     word2idx = {}
     vocab_size = 0
-    
+
     for caption in train_text:
         for index, word in enumerate(caption):
             if word in word2idx:
@@ -108,52 +126,59 @@ def preprocess_data(desired_range, desired_split):
                 word2idx[word] = vocab_size
                 caption[index] = vocab_size
                 vocab_size += 1
-    
+
     for caption in test_text:
         for index, word in enumerate(caption):
-            caption[index] = word2idx[word] 
+            caption[index] = word2idx[word]
 
-    return dict(train_images = np.array(thumbnails[:train_num]),
-                test_images = np.array(thumbnails[train_num:]),
-                train_text = np.array(train_text),
-                test_text = np.array(test_text),
-                train_nums = np.array(numbers[:train_num]),
-                test_nums = np.array(numbers[train_num:]),
-                train_views = np.array(views[:train_num]),
-                test_views = np.array(views[train_num:]),
-                word2idx = word2idx,
-                idx2word = {v:k for k,v in word2idx.items()})
+    return dict(train_images=np.array(thumbnails[:train_num]),
+                test_images=np.array(thumbnails[train_num:]),
+                train_text=np.array(train_text),
+                test_text=np.array(test_text),
+                train_nums=np.array(numbers[:train_num]),
+                test_nums=np.array(numbers[train_num:]),
+                train_views=np.array(views[:train_num]),
+                test_views=np.array(views[train_num:]),
+                word2idx=word2idx,
+                idx2word={v: k for k, v in word2idx.items()})
+
 
 if __name__ == '__main__':
 
     n = len(sys.argv)
     if n != 3:
-        print("usage: python preprocess.py [number of data points] [percentage of data used for training]")
+        print(
+            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
         print("sample usage: python preprocess.py 10000 0.7")
         exit()
 
     try:
         desired_range = int(sys.argv[1])
     except:
-        print("usage: python preprocess.py [number of data points] [percentage of data used for training]")
+        print(
+            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
         print("sample usage: python preprocess.py 10000 0.7")
         print("[number of data points] must be an integer")
         exit()
     if desired_range < 1 or desired_range > 200000:
-        print("usage: python preprocess.py [number of data points] [percentage of data used for training]")
+        print(
+            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
         print("sample usage: python preprocess.py 10000 0.7")
-        print("[number of data points] must be an integer greater than 0 and less than 200000")
+        print(
+            "[number of data points] must be an integer greater than 0 and less than 200000")
         exit()
 
     try:
         desired_split = float(sys.argv[2])
     except:
-        print("usage: python preprocess.py [number of data points] [percentage of data used for training]")
+        print(
+            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
         print("sample usage: python preprocess.py 10000 0.7")
         print("[percentage of data used for training] must be a float")
         exit()
     if desired_split < 0 or desired_split > 1:
-        print("usage: python preprocess.py [number of data points] [percentage of data used for training]")
+        print(
+            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
         print("sample usage: python preprocess.py 10000 0.7")
         print("[percentage of data used for training] must be a float between 0 and 1")
         exit()

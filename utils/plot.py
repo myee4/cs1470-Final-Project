@@ -11,6 +11,7 @@ view_data = pd.read_csv("./kaggle_data/one_data_to_rule_them_all.csv")
 # Sample series of numbers
 data = view_data['view_count']
 
+
 def plot_distribution(data, bins=1000):
     # Create a histogram using matplotlib
     plt.hist(data, bins=bins, edgecolor='black')
@@ -22,6 +23,7 @@ def plot_distribution(data, bins=1000):
 
     # Show the plot
     plt.show()
+
 
 # Call the function with the data
 plot_distribution(data)

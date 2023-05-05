@@ -50,12 +50,13 @@ for video in videos_response['items']:
     thumbnail_url = video['snippet']['thumbnails']['default']['url']
     view_count = video['statistics']['viewCount']
     like_count = video['statistics']['likeCount']
-    date_published = datetime.strptime(video['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
-    
+    date_published = datetime.strptime(
+        video['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+
     channel_id = video['snippet']['channelId']
     channel_response = youtube.channels().list(
-    id=channel_id,
-    part='statistics'
+        id=channel_id,
+        part='statistics'
     ).execute()
     subscriber_count = channel_response['items'][0]['statistics']['subscriberCount']
 
@@ -68,4 +69,4 @@ for video in videos_response['items']:
     print(f'Date published: {date_published}')
     print(f'Subscribers: {subscriber_count}')
     print('--------------------------  ' + str(count))
-    count +=1 
+    count += 1

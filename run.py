@@ -3,7 +3,8 @@ import numpy as np
 import tensorflow as tf
 from model import ThumbnailModel, accuracy_function, loss_function
 
-def train(model, train_images, train_text, train_nums, train_views, batch_size = 100):
+
+def train(model, train_images, train_text, train_nums, train_views, batch_size=100):
     total_loss = 0
     total_acc = 0
     num_batches = int(len(train_images) / batch_size)
@@ -21,7 +22,8 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size =
             acc = accuracy_function(preds, batch_views)
 
         gradients = tape.gradient(loss, model.trainable_variables)
-        model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        model.optimizer.apply_gradients(
+            zip(gradients, model.trainable_variables))
         total_loss += loss
         total_acc += acc
 
@@ -29,11 +31,13 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size =
     avg_acc = total_acc / num_batches
     return avg_loss.numpy(), avg_acc.numpy()
 
+
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
     loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
     return loss.numpy(), acc.numpy()
+
 
 def main():
     file_path = r'./data/data.p'
@@ -50,17 +54,19 @@ def main():
     word2idx = data_dict['word2idx']
 
     model = ThumbnailModel(4096, 5, 128, len(word2idx), 50)
-    
+
     epochs = 50
 
     print("---------------------------TRAIN---------------------------")
     for i in range(epochs):
-        print(f"---------------------------EPOCH {i}---------------------------")
+        print(
+            f"---------------------------EPOCH {i}---------------------------")
         print(train(model, train_images, train_text, train_nums, train_views))
         print("----------------------------------------------------------------")
 
     print("---------------------------TEST---------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
+
 
 if __name__ == "__main__":
     main()
