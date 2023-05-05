@@ -4,7 +4,7 @@ import tensorflow as tf
 from model import ThumbnailModel, accuracy_function, loss_function
 
 
-def train(model, train_images, train_text, train_nums, train_views, batch_size=100):
+def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
     total_loss = 0
     total_acc = 0
     num_batches = int(len(train_images) / batch_size)
@@ -29,14 +29,16 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
 
     avg_loss = total_loss / num_batches
     avg_acc = total_acc / num_batches
-    return avg_loss.numpy(), avg_acc.numpy()
+    # return avg_loss.numpy(), avg_acc.numpy()
+    return avg_acc.numpy()
 
 
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
     loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
-    return loss.numpy(), acc.numpy()
+    # return loss.numpy(), acc.numpy()
+    return acc.numpy()
 
 
 def main():
@@ -55,16 +57,16 @@ def main():
 
     model = ThumbnailModel(4096, 5, 128, len(word2idx), 50)
 
-    epochs = 50
+    epochs = 30
 
-    print("---------------------------TRAIN---------------------------")
+    print("---------------------------TRAIN-----------------------------")
     for i in range(epochs):
         print(
             f"---------------------------EPOCH {i}---------------------------")
         print(train(model, train_images, train_text, train_nums, train_views))
-        print("----------------------------------------------------------------")
+        print("-------------------------------------------------------------")
 
-    print("---------------------------TEST---------------------------")
+    print("---------------------------TEST------------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
 
 

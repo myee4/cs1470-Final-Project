@@ -18,8 +18,7 @@ class ThumbnailModel(tf.keras.Model):
         # inspired by http://cs231n.stanford.edu/reports/2017/pdfs/710.pdf
         self.images_arch = tf.keras.Sequential(
             layers=[
-                tf.keras.layers.Conv2D(self.filter_size, 3, padding="SAME"),
-                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(self.filter_size, 4, padding="SAME"),
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.MaxPool2D(
                     padding="SAME", pool_size=(3, 3), strides=2),
@@ -35,7 +34,7 @@ class ThumbnailModel(tf.keras.Model):
                 tf.keras.layers.Conv2D(3, 1, padding="SAME"),
                 tf.keras.layers.LeakyReLU(),
 
-                tf.keras.layers.Conv2D(1, 1, padding="SAME"),
+                tf.keras.layers.Conv2D(3, 1, padding="SAME"),
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.MaxPool2D(
                     padding="SAME", pool_size=(3, 3), strides=2),
@@ -75,8 +74,9 @@ class ThumbnailModel(tf.keras.Model):
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.Dropout(0.5),
 
-                tf.keras.layers.Dense(self.hidden_size / 4),
-                # tf.keras.layers.ReLU(),
+                tf.keras.layers.Dense(self.hidden_size / 2),
+                tf.keras.layers.LeakyReLU(),
+                tf.keras.layers.Dropout(0.5),
 
                 tf.keras.layers.Dense(1)
             ]
