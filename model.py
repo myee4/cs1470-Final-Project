@@ -11,7 +11,7 @@ class ThumbnailModel(tf.keras.Model):
         self.vocab_size = vocab_size
         self.window_size = window_size
 
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
         self.embed_layer = tf.keras.layers.Embedding(
             input_dim=self.vocab_size, output_dim=self.embed_size, trainable=True, input_length=self.window_size)
 
@@ -19,6 +19,7 @@ class ThumbnailModel(tf.keras.Model):
         self.images_arch = tf.keras.Sequential(
             layers=[
                 tf.keras.layers.Conv2D(self.filter_size, 4, padding="SAME"),
+                tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.MaxPool2D(
                     padding="SAME", pool_size=(3, 3), strides=2),
@@ -34,7 +35,7 @@ class ThumbnailModel(tf.keras.Model):
                 tf.keras.layers.Conv2D(3, 1, padding="SAME"),
                 tf.keras.layers.LeakyReLU(),
 
-                tf.keras.layers.Conv2D(3, 1, padding="SAME"),
+                tf.keras.layers.Conv2D(1, 1, padding="SAME"),
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.MaxPool2D(
                     padding="SAME", pool_size=(3, 3), strides=2),
@@ -78,7 +79,7 @@ class ThumbnailModel(tf.keras.Model):
                 tf.keras.layers.LeakyReLU(),
                 tf.keras.layers.Dropout(0.5),
 
-                tf.keras.layers.Dense(1)
+                tf.keras.layers.Dense(1),
             ]
         )
 
@@ -90,7 +91,7 @@ class ThumbnailModel(tf.keras.Model):
 
         combined_output = tf.concat(
             [images_output, text_output, nums_output], axis=1)
-        estimation = self.feed_forward(combined_output)
+        estimation = abs(self.feed_forward(combined_output))
 
         return estimation
 
@@ -105,4 +106,5 @@ def accuracy_function(preds, labels):
 
 
 def loss_function(preds, labels):
-    return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
+    return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
+    # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))

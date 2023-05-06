@@ -6,7 +6,7 @@ we sourced from Kaggle. This was to make sure that the distribution of data was 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-view_data = pd.read_csv("./kaggle_data/one_data_to_rule_them_all.csv")
+view_data = pd.read_csv("../data/one_data_to_rule_them_all.csv")
 
 # Sample series of numbers
 data = view_data['view_count']

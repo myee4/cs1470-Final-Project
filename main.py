@@ -35,6 +35,9 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
 
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
+    print("text: ", test_text)
+    print("prediction: ", preds)
+    print("real views: ", test_views)
     loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
     # return loss.numpy(), acc.numpy()
@@ -57,7 +60,7 @@ def main():
 
     model = ThumbnailModel(4096, 5, 128, len(word2idx), 50)
 
-    epochs = 30
+    epochs = 25
 
     print("---------------------------TRAIN-----------------------------")
     for i in range(epochs):
