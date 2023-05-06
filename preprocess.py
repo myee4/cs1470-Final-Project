@@ -148,22 +148,22 @@ if __name__ == '__main__':
     n = len(sys.argv)
     if n != 3:
         print(
-            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
-        print("sample usage: python preprocess.py 10000 0.7")
+            "usage: python preprocess.py [number of data points] [percentage of data for training]")
+        print("example: python preprocess.py 10000 0.7")
         exit()
 
     try:
         desired_range = int(sys.argv[1])
     except:
         print(
-            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
-        print("sample usage: python preprocess.py 10000 0.7")
+            "usage: python preprocess.py [number of data points] [percentage of data for training]")
+        print("example: python preprocess.py 10000 0.7")
         print("[number of data points] must be an integer")
         exit()
     if desired_range < 1 or desired_range > 200000:
         print(
-            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
-        print("sample usage: python preprocess.py 10000 0.7")
+            "usage: python preprocess.py [number of data points] [percentage of data for training]")
+        print("example: python preprocess.py 10000 0.7")
         print(
             "[number of data points] must be an integer greater than 0 and less than 200000")
         exit()
@@ -172,15 +172,15 @@ if __name__ == '__main__':
         desired_split = float(sys.argv[2])
     except:
         print(
-            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
-        print("sample usage: python preprocess.py 10000 0.7")
-        print("[percentage of data used for training] must be a float")
+            "usage: python preprocess.py [number of data points] [percentage of data for training]")
+        print("example: python preprocess.py 10000 0.7")
+        print("[percentage of data for training] must be a float")
         exit()
     if desired_split < 0 or desired_split > 1:
         print(
-            "usage: python preprocess.py [number of data points] [percentage of data used for training]")
-        print("sample usage: python preprocess.py 10000 0.7")
-        print("[percentage of data used for training] must be a float between 0 and 1")
+            "usage: python preprocess.py [number of data points] [percentage of data for training]")
+        print("example: python preprocess.py 10000 0.7")
+        print("[percentage of data for training] must be a float between 0 and 1")
         exit()
 
     with open(f'data/data.p', 'wb') as pickle_file:
