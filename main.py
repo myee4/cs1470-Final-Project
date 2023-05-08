@@ -1,11 +1,11 @@
 import pickle
 import numpy as np
 import tensorflow as tf
-from model import ThumbnailModel, accuracy_function, loss_function
+from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, ImageModel, TextModel, NumModel, accuracy_function, loss_function
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
-    total_loss = 0
+    #total_loss = 0
     total_acc = 0
     num_batches = int(len(train_images) / batch_size)
 
@@ -24,10 +24,10 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(
             zip(gradients, model.trainable_variables))
-        total_loss += loss
+        #total_loss += loss
         total_acc += acc
 
-    avg_loss = total_loss / num_batches
+    # avg_loss = total_loss / num_batches
     avg_acc = total_acc / num_batches
     # return avg_loss.numpy(), avg_acc.numpy()
     return avg_acc.numpy()
@@ -35,17 +35,17 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
 
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
-    print("text: ", test_text)
-    print("prediction: ", preds)
-    print("real views: ", test_views)
-    loss = loss_function(preds, test_views)
+    # print("text: ", test_text)
+    # print("prediction: ", preds)
+    # print("real views: ", test_views)
+    # loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
     # return loss.numpy(), acc.numpy()
     return acc.numpy()
 
 
 def main():
-    file_path = r'./data/data.p'
+    file_path = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\data\data.p'
     with open(file_path, 'rb') as data_file:
         data_dict = pickle.load(data_file)
     train_images = np.array(data_dict['train_images'])
@@ -63,11 +63,22 @@ def main():
     epochs = 25
 
     print("---------------------------TRAIN-----------------------------")
+    #accuracy array
+    acc = [0] * epochs
+    #count for a stable acccuracy
+    stable_count = 0
     for i in range(epochs):
+        acc[i] = train(model, train_images, train_text, train_nums, train_views)
         print(
             f"---------------------------EPOCH {i}---------------------------")
-        print(train(model, train_images, train_text, train_nums, train_views))
+        print(acc[i])
         print("-------------------------------------------------------------")
+        if (acc[i] < acc[i-1]+5) and (acc[i] > acc[i-1]-5):
+            stable_count +=1
+        else:
+            stable_count = 0
+        if stable_count >= 5:
+            break
 
     print("---------------------------TEST------------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
