@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 import tensorflow as tf
-from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, ImageModel, TextModel, NumModel, accuracy_function, loss_function
+from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, ImageModel, TextModel, NumModel, SingleModel, accuracy_function, loss_function
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
@@ -36,7 +36,7 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
     # print("text: ", test_text)
-    # print("prediction: ", preds)
+    print("prediction: ", preds)
     # print("real views: ", test_views)
     # loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
@@ -44,8 +44,9 @@ def test(model, test_images, test_text, test_nums, test_views):
     return acc.numpy()
 
 
+
 def main():
-    file_path = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\data\data.p'
+    file_path = r'.\cs1470-Final-Project\data\data.p'
     with open(file_path, 'rb') as data_file:
         data_dict = pickle.load(data_file)
     train_images = np.array(data_dict['train_images'])
@@ -58,7 +59,7 @@ def main():
     test_views = np.array(data_dict['test_views'])
     word2idx = data_dict['word2idx']
 
-    model = ThumbnailModel(4096, 5, 128, len(word2idx), 50)
+    model = SingleModel(4096, 5, 128, len(word2idx), 50)
 
     epochs = 25
 
@@ -73,11 +74,11 @@ def main():
             f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")
-        if (acc[i] < acc[i-1]+5) and (acc[i] > acc[i-1]-5):
+        if (acc[i] < acc[i-1]+3) and (acc[i] > acc[i-1]-3):
             stable_count +=1
         else:
             stable_count = 0
-        if stable_count >= 5:
+        if stable_count >= 4:
             break
 
     print("---------------------------TEST------------------------------")
