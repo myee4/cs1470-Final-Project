@@ -5,7 +5,7 @@ from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, I
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
-    #total_loss = 0
+    # total_loss = 0
     total_acc = 0
     num_batches = int(len(train_images) / batch_size)
 
@@ -24,7 +24,7 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(
             zip(gradients, model.trainable_variables))
-        #total_loss += loss
+        # total_loss += loss
         total_acc += acc
 
     # avg_loss = total_loss / num_batches
@@ -45,7 +45,8 @@ def test(model, test_images, test_text, test_nums, test_views):
 
 
 def main():
-    file_path = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\data\data.p'
+    # file_path = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\data\data.p'
+    file_path = './data/data.p'
     with open(file_path, 'rb') as data_file:
         data_dict = pickle.load(data_file)
     train_images = np.array(data_dict['train_images'])
@@ -58,23 +59,24 @@ def main():
     test_views = np.array(data_dict['test_views'])
     word2idx = data_dict['word2idx']
 
-    model = ThumbnailModel(4096, 5, 128, len(word2idx), 50)
+    model = NumTextModel(4096, 5, 128, len(word2idx), 50)
 
-    epochs = 25
+    epochs = 35
 
     print("---------------------------TRAIN-----------------------------")
-    #accuracy array
+    # accuracy array
     acc = [0] * epochs
-    #count for a stable acccuracy
+    # count for a stable acccuracy
     stable_count = 0
     for i in range(epochs):
-        acc[i] = train(model, train_images, train_text, train_nums, train_views)
+        acc[i] = train(model, train_images, train_text,
+                       train_nums, train_views)
         print(
             f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")
         if (acc[i] < acc[i-1]+5) and (acc[i] > acc[i-1]-5):
-            stable_count +=1
+            stable_count += 1
         else:
             stable_count = 0
         if stable_count >= 5:
