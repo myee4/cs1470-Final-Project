@@ -76,7 +76,7 @@ dictionary in a pickle file.
 
 def preprocess_data(desired_range, desired_split):
     # data: https://www.kaggle.com/datasets/rsrishav/youtube-trending-video-dataset/versions/1000
-    data_file = r'./data/one_data_to_rule_them_all.csv'
+    data_file = r'C:\Users\matth\OneDrive\Desktop\DEEP_Learning\cs1470-Final-Project\data\one_data_to_rule_them_all.csv'
     specific_rows = [i for i in range(desired_range)]
     specific_data = pd.read_csv(
         data_file, skiprows=lambda x: x not in specific_rows)

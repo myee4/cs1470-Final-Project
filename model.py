@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 
 SEED = 0
@@ -767,6 +768,29 @@ class NumModel(tf.keras.Model):
         self.accuracy_function = metrics[0]
 
 
+class SingleModel(tf.keras.Model):
+
+    def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.filter_size = filter_size
+        self.embed_size = embed_size
+        self.vocab_size = vocab_size
+        self.window_size = window_size
+
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=1000)
+        
+        self.feed_forward = tf.Variable(initial_value= tf.random.normal([1],mean =100000, stddev = 1), trainable = True)
+
+    def call(self, images, text, nums):
+        return self.feed_forward
+
+    def compile(self, optimizer, loss, metrics):
+        self.optimizer = optimizer
+        self.loss_function = loss
+        self.accuracy_function = metrics[0]
+
+
 def accuracy_function(preds, labels):
     return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
 
@@ -774,3 +798,5 @@ def accuracy_function(preds, labels):
 def loss_function(preds, labels):
     return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
     # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
+
+

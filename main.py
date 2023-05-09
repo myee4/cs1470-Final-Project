@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 import tensorflow as tf
-from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, ImageModel, TextModel, NumModel, accuracy_function, loss_function
+from model import ThumbnailModel, ImageNumModel, NumTextModel, ImageTextModel, ImageModel, TextModel, NumModel, SingleModel, accuracy_function, loss_function
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
@@ -36,7 +36,7 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
     # print("text: ", test_text)
-    # print("prediction: ", preds)
+    print("prediction: ", preds)
     # print("real views: ", test_views)
     # loss = loss_function(preds, test_views)
     acc = accuracy_function(preds, test_views)
@@ -75,11 +75,16 @@ def main():
             f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")
+
         if (acc[i] < acc[i-1]+5) and (acc[i] > acc[i-1]-5):
             stable_count += 1
+
+        if (acc[i] < acc[i-1]+3) and (acc[i] > acc[i-1]-3):
+            stable_count += 1
+
         else:
             stable_count = 0
-        if stable_count >= 5:
+        if stable_count >= 4:
             break
 
     print("---------------------------TEST------------------------------")
