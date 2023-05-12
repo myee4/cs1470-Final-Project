@@ -51,7 +51,7 @@ def preprocess_dates(dates):
         utc_date = datetime.datetime.fromisoformat(str(iso_date)).replace(tzinfo=datetime.timezone.utc)
         unix_timestamp = int(utc_date.timestamp())
         preprocessed_dates[i] = unix_timestamp
-    preprocess_dates = (preprocess_dates - np.mean(preprocess_dates)) / np.var(preprocess_dates)
+    preprocessed_dates = (preprocessed_dates - np.mean(preprocessed_dates)) / np.var(preprocessed_dates)
     return preprocessed_dates
 
 '''
