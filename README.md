@@ -34,6 +34,10 @@ i.e., all models were run with a learning rate of 0.1, batch size of 10, and 25 
 stabilization function that terminates training once the model trains for 3 consecutive epochs without 
 improving accuracy by more than 2.5% points.
 
+Note: The learning rate argument is limited to be between 0 and 1, but if you want to reproduce the results
+of the Simple Model that are explained in the written report, you will need a learning rate of 1000. This 
+can be manually changed by removing the upper bound constraint on line 146 in `main.py`.
+
 ## /models
 
 This directory contains 3 python files `enhanced_model.py`, `combined_models.py`, and `simple_models.py` 
