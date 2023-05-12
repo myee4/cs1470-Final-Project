@@ -104,5 +104,5 @@ def accuracy_function(preds, labels):
 
 def loss_function(preds, labels):
     return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
-    # TODO: add explanation
+    # TODO: 
     # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
