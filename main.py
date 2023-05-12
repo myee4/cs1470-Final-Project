@@ -78,8 +78,7 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
             model = TextModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
         case 'SimpleModel':
             model = SimpleModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
-        case 'SemiSimpleModel':
-            model = SemiSimpleModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
+
 
     epochs = desired_epochs
 

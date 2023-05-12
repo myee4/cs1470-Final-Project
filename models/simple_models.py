@@ -190,31 +190,3 @@ class SimpleModel(tf.keras.Model):
         self.optimizer = optimizer
         self.loss_function = loss
         self.accuracy_function = metrics[0]
-
-
-class SemiSimpleModel(tf.keras.Model):
-
-    def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
-        super().__init__()
-        self.hidden_size = hidden_size
-        self.filter_size = filter_size
-        self.embed_size = embed_size
-        self.vocab_size = vocab_size
-        self.window_size = window_size
-
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=desired_learning_rate)
-        
-        self.feed_forward_1 = tf.Variable(initial_value=tf.random.normal([1], seed = SEED), trainable=True)
-        self.feed_forward_2 = tf.Variable(initial_value=tf.random.normal([1], seed = SEED), trainable=True)
-
-    def call(self, images, text, nums):
-        if tf.reduce_mean(nums[1]) < 0:
-            estimation =  self.feed_forward_1
-        else:
-            estimation =  self.feed_forward_2
-        return estimation
-
-    def compile(self, optimizer, loss, metrics):
-        self.optimizer = optimizer
-        self.loss_function = loss
-        self.accuracy_function = metrics[0]
