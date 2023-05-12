@@ -93,7 +93,7 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
         print("-------------------------------------------------------------")
         '''
         In order to speed up training, we have implemented a cut-off function that ends training
-        so that we don't needlessly train our models wasting time or overfit the trainning data.
+        so that we don't needlessly train our models wasting time or overfit the training data.
         Due to our previous experieces with how our models perform and learn, plus or minus 2.5%
         accuracy for 4 epochs was deemed a plateau in minimizing loss.
         '''
