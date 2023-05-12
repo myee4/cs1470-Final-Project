@@ -2,9 +2,9 @@ import sys
 import pickle
 import numpy as np
 import tensorflow as tf
-from enhanced_model import EnhancedModel, accuracy_function, loss_function
-from combined_models import ImageNumModel, ImageTextModel, NumTextModel
-from simple_models import ImageModel, TextModel, NumModel, SimpleModel
+from models.enhanced_model import EnhancedModel, accuracy_function, loss_function
+from models.combined_models import ImageNumModel, ImageTextModel, NumTextModel
+from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
@@ -44,7 +44,7 @@ def test(model, test_images, test_text, test_nums, test_views):
     return acc.numpy()
 
 
-def main(desired_model, desired_learning_rate, desired_batch_size, desried_epochs):
+def main(desired_model, desired_learning_rate, desired_batch_size, desired_epochs):
 
     file_path = './data/data.p'
     with open(file_path, 'rb') as data_file:
@@ -58,6 +58,8 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desried_epoch
     train_views = np.array(data_dict['train_views'])
     test_views = np.array(data_dict['test_views'])
     word2idx = data_dict['word2idx']
+
+    model = None
 
     match desired_model:
         case 'EnhancedModel':
@@ -77,7 +79,7 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desried_epoch
         case 'SimpleModel':
             model = SimpleModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
 
-    epochs = desried_epochs
+    epochs = desired_epochs
 
     # TODO: explain stabilization function
     # TODO: make stabilization only work if it stabilizes consecutively, currently does not do that
@@ -108,6 +110,16 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desried_epoch
 if __name__ == "__main__":
 
     n = len(sys.argv)
+
+    # default run
+    if n == 1:
+        desired_model = 'EnhancedModel'
+        desired_learning_rate = 0.1
+        desired_batch_size = 10
+        desired_epochs = 25
+        main(desired_model, desired_learning_rate, desired_batch_size, desired_epochs)
+        exit()
+    
     if n != 5:
         print("usage: python main.py [model] [learning rate] [batch size] [epochs]")
         print("example: python main.py EnhancedModel 0.1 10 25")
@@ -154,16 +166,16 @@ if __name__ == "__main__":
         exit()
 
     try:
-        desried_epochs = int(sys.argv[4])
+        desired_epochs = int(sys.argv[4])
     except:
         print("usage: python main.py [model] [learning rate] [batch size] [epochs]")
         print("example: python main.py EnhancedModel 0.1 10 25")
         print("[batch size] must be an integer")
         exit()
-    if desried_epochs < 1 or desried_epochs > 100:
+    if desired_epochs < 1 or desired_epochs > 100:
         print("usage: python main.py [model] [learning rate] [batch size] [epochs]")
         print("example: python main.py EnhancedModel 0.1 10 25")
         print("[epochs] must be an integer greater than 0 and less than 100")
         exit()
 
-    main(desired_model, desired_learning_rate, desired_batch_size, desried_epochs)
+    main(desired_model, desired_learning_rate, desired_batch_size, desired_epochs)
