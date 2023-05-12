@@ -88,8 +88,7 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desried_epoch
     # count for a stable acccuracy
     stable_count = 0
     for i in range(epochs):
-        acc[i] = train(model, train_images, train_text,
-                       train_nums, train_views, desired_batch_size)
+        acc[i] = train(model, train_images, train_text, train_nums, train_views, desired_batch_size)
         print(f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")

@@ -80,7 +80,7 @@ class ImageNumModel(tf.keras.Model):
         self.accuracy_function = metrics[0]
 
 
-class EnhancedModel(tf.keras.Model):
+class ImageTextModel(tf.keras.Model):
 
     def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
         super().__init__()
@@ -167,7 +167,7 @@ class EnhancedModel(tf.keras.Model):
         self.accuracy_function = metrics[0]
 
 
-class EnhancedModel(tf.keras.Model):
+class NumTextModel(tf.keras.Model):
 
     def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
         super().__init__()
