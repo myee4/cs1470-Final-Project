@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from models.enhanced_model import EnhancedModel, accuracy_function, loss_function
 from models.combined_models import ImageNumModel, ImageTextModel, NumTextModel
-from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel
+from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel, SemiSimpleModel
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
@@ -78,6 +78,8 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
             model = TextModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
         case 'SimpleModel':
             model = SimpleModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
+        case 'SemiSimpleModel':
+            model = SemiSimpleModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
 
     epochs = desired_epochs
 

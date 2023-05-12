@@ -70,7 +70,7 @@ class ImageNumModel(tf.keras.Model):
         nums_output = self.nums_arch(nums)
 
         combined_output = tf.concat([images_output, nums_output], axis=1)
-        estimation = abs(self.feed_forward(combined_output))
+        estimation = self.feed_forward(combined_output)
 
         return estimation
 
@@ -157,7 +157,7 @@ class ImageTextModel(tf.keras.Model):
         text_output = tf.reshape(self.text_arch(self.embed_layer(text)), [text.shape[0], -1])
 
         combined_output = tf.concat([images_output, text_output], axis=1)
-        estimation = abs(self.feed_forward(combined_output))
+        estimation = self.feed_forward(combined_output)
 
         return estimation
 
@@ -224,7 +224,7 @@ class NumTextModel(tf.keras.Model):
         nums_output = self.nums_arch(nums)
 
         combined_output = tf.concat([text_output, nums_output], axis=1)
-        estimation = abs(self.feed_forward(combined_output))
+        estimation = self.feed_forward(combined_output)
 
         return estimation
 

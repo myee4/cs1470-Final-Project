@@ -88,7 +88,7 @@ class EnhancedModel(tf.keras.Model):
         nums_output = self.nums_arch(nums)
 
         combined_output = tf.concat([images_output, text_output, nums_output], axis=1)
-        estimation = abs(self.feed_forward(combined_output))
+        estimation = self.feed_forward(combined_output)
 
         return estimation
 
@@ -104,5 +104,7 @@ def accuracy_function(preds, labels):
 
 def loss_function(preds, labels):
     return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
-    # TODO: 
+    # Originally, we used mse as our loss function, however, due to the variance in
+    # our data, some views in the hundreds of millions and others in the low thousands,
+    # we wanted our model to try and minimize relative loss as opposed to an absolute metric.
     # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))

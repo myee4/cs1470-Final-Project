@@ -58,7 +58,7 @@ class ImageModel(tf.keras.Model):
 
     def call(self, images, text, nums):
         images_output = self.images_arch(images)
-        estimation = abs(self.feed_forward(images_output))
+        estimation = self.feed_forward(images_output)
         return estimation
 
     def compile(self, optimizer, loss, metrics):
@@ -113,7 +113,7 @@ class TextModel(tf.keras.Model):
 
     def call(self, images, text, nums):
         text_output = tf.reshape(self.text_arch(self.embed_layer(text)), [text.shape[0], -1])
-        estimation = abs(self.feed_forward(text_output))
+        estimation = self.feed_forward(text_output)
         return estimation
 
     def compile(self, optimizer, loss, metrics):
@@ -159,7 +159,7 @@ class NumModel(tf.keras.Model):
 
     def call(self, images, text, nums):
         nums_output = self.nums_arch(nums)
-        estimation = abs(self.feed_forward(nums_output))
+        estimation = self.feed_forward(nums_output)
         return estimation
 
     def compile(self, optimizer, loss, metrics):
@@ -184,6 +184,34 @@ class SimpleModel(tf.keras.Model):
 
     def call(self, images, text, nums):
         estimation =  self.feed_forward
+        return estimation
+
+    def compile(self, optimizer, loss, metrics):
+        self.optimizer = optimizer
+        self.loss_function = loss
+        self.accuracy_function = metrics[0]
+
+
+class SemiSimpleModel(tf.keras.Model):
+
+    def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.filter_size = filter_size
+        self.embed_size = embed_size
+        self.vocab_size = vocab_size
+        self.window_size = window_size
+
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=desired_learning_rate)
+        
+        self.feed_forward_1 = tf.Variable(initial_value=tf.random.normal([1], seed = SEED), trainable=True)
+        self.feed_forward_2 = tf.Variable(initial_value=tf.random.normal([1], seed = SEED), trainable=True)
+
+    def call(self, images, text, nums):
+        if tf.reduce_mean(nums[1]) < 0:
+            estimation =  self.feed_forward_1
+        else:
+            estimation =  self.feed_forward_2
         return estimation
 
     def compile(self, optimizer, loss, metrics):

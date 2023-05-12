@@ -20,7 +20,7 @@ def preprocess_images(thumbnail_urls):
     for i, url in enumerate(thumbnail_urls):
         image_data = requests.get(url).content
         image = Image.open(BytesIO(image_data))
-        preprocessed_images[i] = np.asarray(image.getdata(), dtype=np.float32).reshape(120, 90, 3)
+        preprocessed_images[i] = np.asarray(image.getdata(), dtype=np.float32).reshape(120, 90, 3) / 255
     return preprocessed_images
 
 '''
@@ -42,7 +42,7 @@ def preprocess_text(titles, hashtags, window_size=50):
 
 '''
 preprocess_dates() takes in a list of the dates on which videos were published and
-converts that information to a standardized format.
+converts that information to a standardized format, albeit normalized.
 '''
 def preprocess_dates(dates):
     preprocessed_dates = [None] * dates.shape[0]
@@ -51,13 +51,14 @@ def preprocess_dates(dates):
         utc_date = datetime.datetime.fromisoformat(str(iso_date)).replace(tzinfo=datetime.timezone.utc)
         unix_timestamp = int(utc_date.timestamp())
         preprocessed_dates[i] = unix_timestamp
+    preprocess_dates = (preprocess_dates - np.mean(preprocess_dates)) / np.var(preprocess_dates)
     return preprocessed_dates
 
 '''
 preprocess_data() takes in the number of data points a user wants to use to train their 
 model and their desired train-test data split. It then reads that data from a csv file
 containing data on 200,000 YouTube videos, and then stores all the relevant data as a 
-dictionary in a pickle file.
+dictionary in a pickle file. The data is normalized before being stored as the dictionary.
 '''
 def preprocess_data(desired_range, desired_split):
     # data source: https://www.kaggle.com/datasets/rsrishav/youtube-trending-video-dataset/versions/1000
@@ -68,8 +69,12 @@ def preprocess_data(desired_range, desired_split):
     thumbnails = preprocess_images(specific_data['thumbnail_link'])
     text = preprocess_text(specific_data['title'], specific_data['tags'])
     dates = preprocess_dates(specific_data['publishedAt'])
+
     likes = specific_data['likes']
     views = specific_data['view_count']
+    likes = (likes - np.mean(likes)) / np.var(likes)
+    views = (views - np.mean(views)) / np.var(views)
+
     numbers = np.concatenate([tf.expand_dims(dates, axis=1), tf.expand_dims(likes, axis=1)], axis=1)
 
     ids = specific_data['video_id']
