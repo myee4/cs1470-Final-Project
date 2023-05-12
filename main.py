@@ -73,7 +73,7 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
         case 'ImageModel':
             model = ImageModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
         case 'NumModel':
-            model = NumModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
+            model = NumModel(32, 5, 128, len(word2idx), 50, desired_learning_rate)
         case 'TextModel':
             model = TextModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
         case 'SimpleModel':
