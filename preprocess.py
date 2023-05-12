@@ -20,7 +20,7 @@ def preprocess_images(thumbnail_urls):
     for i, url in enumerate(thumbnail_urls):
         image_data = requests.get(url).content
         image = Image.open(BytesIO(image_data))
-        preprocessed_images[i] = np.asarray(image.getdata(), dtype=np.float32).reshape(120, 90, 3) / 255
+        preprocessed_images[i] = np.asarray(image.getdata(), dtype=np.float32).reshape(120, 90, 3)
     return preprocessed_images
 
 '''
@@ -51,7 +51,6 @@ def preprocess_dates(dates):
         utc_date = datetime.datetime.fromisoformat(str(iso_date)).replace(tzinfo=datetime.timezone.utc)
         unix_timestamp = int(utc_date.timestamp())
         preprocessed_dates[i] = unix_timestamp
-    preprocessed_dates = (preprocessed_dates - np.mean(preprocessed_dates)) / np.var(preprocessed_dates)
     return preprocessed_dates
 
 '''
@@ -69,11 +68,8 @@ def preprocess_data(desired_range, desired_split):
     thumbnails = preprocess_images(specific_data['thumbnail_link'])
     text = preprocess_text(specific_data['title'], specific_data['tags'])
     dates = preprocess_dates(specific_data['publishedAt'])
-
     likes = specific_data['likes']
     views = specific_data['view_count']
-    likes = (likes - np.mean(likes)) / np.var(likes)
-    views = (views - np.mean(views)) / np.var(views)
 
     numbers = np.concatenate([tf.expand_dims(dates, axis=1), tf.expand_dims(likes, axis=1)], axis=1)
 

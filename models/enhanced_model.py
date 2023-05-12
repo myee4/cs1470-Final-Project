@@ -103,8 +103,8 @@ def accuracy_function(preds, labels):
 
 
 def loss_function(preds, labels):
-    # return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
+    return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
     # Originally, we used mse as our loss function, however, due to the variance in
     # our data, some views in the hundreds of millions and others in the low thousands,
     # we wanted our model to try and minimize relative loss as opposed to an absolute metric.
-    return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
+    # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
