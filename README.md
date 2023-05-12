@@ -31,8 +31,8 @@ example: `python main.py EnhancedModel 0.1 10 25`
 
 If no arguments are provided then the example is run, these numbers were used to run all the models we used 
 i.e., all models were run with a learning rate of 0.1, batch size of 10, and 25 epochs. The model has a 
-stabilization function that terminates training once the model trains for 4 consecutive epochs without 
-improving accuracy by more than 2.5%.
+stabilization function that terminates training once the model trains for 3 consecutive epochs without 
+improving accuracy by more than 2.5% points.
 
 ## /models
 

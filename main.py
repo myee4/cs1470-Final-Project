@@ -97,12 +97,12 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
         Due to our previous experieces with how our models perform and learn, plus or minus 2.5%
         accuracy for 4 epochs was deemed a plateau in minimizing loss.
         '''
-        if(acc[i] < stable_accuracy + 2.5) and (acc[i] > stable_accuracy - 2.5):
+        if (acc[i] < stable_accuracy + 2.5) and (acc[i] > stable_accuracy - 2.5):
             stable_count += 1
         else:
             stable_count = 0
             stable_accuracy = acc[i]
-        if stable_count >= 4:
+        if stable_count >= 2:
             break
     print("---------------------------TEST------------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
