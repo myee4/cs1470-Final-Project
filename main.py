@@ -81,27 +81,32 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
 
     epochs = desired_epochs
 
-    # TODO: explain stabilization function
-    # TODO: make stabilization only work if it stabilizes consecutively, currently does not do that
+    # In order to speed up training, we have implemented a cut-off function that ends training
+    # so that we don't needlessly train our models wasting time or overfit the trainning data.
+    # due to our previous experieces with how our models perform and learn, plus or minus 2.5%
+    # accuracy for 4 epochs was deemed a platuea in minimizing loss
 
     print("---------------------------TRAIN-----------------------------")
     # accuracy array
     acc = [0] * epochs
     # count for a stable acccuracy
     stable_count = 0
+    stable_accuracy = 0
     for i in range(epochs):
         acc[i] = train(model, train_images, train_text, train_nums, train_views, desired_batch_size)
         print(f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")
 
-        if (acc[i] < acc[i-1]+3) and (acc[i] > acc[i-1]-3):
+        if(acc[i] < stable_accuracy + 2.5) and (acc[i] > stable_accuracy - 2.5):
             stable_count += 1
         else:
             stable_count = 0
+            stable_accuracy = acc[i]
 
         if stable_count >= 4:
             break
+
 
     print("---------------------------TEST------------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
