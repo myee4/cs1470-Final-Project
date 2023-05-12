@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from models.enhanced_model import EnhancedModel, accuracy_function, loss_function
 from models.combined_models import ImageNumModel, ImageTextModel, NumTextModel
-from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel, SemiSimpleModel
+from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
