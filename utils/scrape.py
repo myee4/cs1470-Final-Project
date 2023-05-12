@@ -3,6 +3,7 @@ Partially sourced from ChatGPT (GPT-4) to help acquire our dataset. We ended up
 not using this since we found a good dataset on Kaggle, but this works.
 '''
 
+# constants will not be included in our repository for privacy reasons
 from datetime import datetime, timezone
 from googleapiclient.discovery import build
 from constants import API_KEY
