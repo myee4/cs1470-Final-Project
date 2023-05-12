@@ -9,3 +9,6 @@ usage: `python preprocess.py [number of data points] [percentage of data for tra
 example: `python preprocess.py 10000 0.7`
 
 the example uses 10000 data points and a 70-30 train-test data split
+
+
+# explain that SEED is not user configurable
