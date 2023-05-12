@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+# SEED is initialized for deterministic results
 SEED = 0
 
 class ImageNumModel(tf.keras.Model):

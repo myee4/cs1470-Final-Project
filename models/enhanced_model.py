@@ -1,7 +1,8 @@
 import tensorflow as tf
 
-# TODO: explain why SEED is initialized
+# SEED is initialized for deterministic results
 SEED = 0
+
 class EnhancedModel(tf.keras.Model):
 
     def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
@@ -103,8 +104,11 @@ def accuracy_function(preds, labels):
 
 
 def loss_function(preds, labels):
-    return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))
-    # Originally, we used mse as our loss function, however, due to the variance in
-    # our data, some views in the hundreds of millions and others in the low thousands,
-    # we wanted our model to try and minimize relative loss as opposed to an absolute metric.
+    '''
+    Originally, we used MSE as our loss function, however, due to the variance in our data, 
+    some views in the hundreds of millions and others in the low thousands, we wanted our 
+    model to try and minimize relative loss as opposed to an absolute metric. This is why 
+    the accuracy and loss functions are the same, hence only accuracy is reported, not loss.
+    '''
     # return tf.reduce_mean(tf.keras.metrics.mean_squared_error(labels, preds))
+    return tf.reduce_mean(tf.keras.metrics.mean_absolute_percentage_error(labels, preds))

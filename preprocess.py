@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     n = len(sys.argv)
 
-    # default run
+    # default parameters
     if n == 1:
         desired_range = 1000
         desired_split = 0.7

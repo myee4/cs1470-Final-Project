@@ -8,8 +8,12 @@ from models.simple_models import ImageModel, TextModel, NumModel, SimpleModel
 
 
 def train(model, train_images, train_text, train_nums, train_views, batch_size=10):
-    # TODO: explain using inline comments why loss and accuracy are the same function
-    # TODO: add this explanation in enhanced_model.py where accuracy and loss fucntion are defined
+    '''
+    Originally, we used MSE as our loss function, however, due to the variance in our data, 
+    some views in the hundreds of millions and others in the low thousands, we wanted our 
+    model to try and minimize relative loss as opposed to an absolute metric. This is why 
+    the accuracy and loss functions are the same, hence only accuracy is reported, not loss.
+    '''
     # total_loss = 0
     total_acc = 0
     num_batches = int(len(train_images) / batch_size)
@@ -37,12 +41,10 @@ def train(model, train_images, train_text, train_nums, train_views, batch_size=1
     # return avg_loss.numpy(), avg_acc.numpy()
     return avg_acc.numpy()
 
-
 def test(model, test_images, test_text, test_nums, test_views):
     preds = model(test_images, test_text, test_nums)
     acc = accuracy_function(preds, test_views)
     return acc.numpy()
-
 
 def main(desired_model, desired_learning_rate, desired_batch_size, desired_epochs):
 
@@ -60,7 +62,6 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
     word2idx = data_dict['word2idx']
 
     model = None
-
     match desired_model:
         case 'EnhancedModel':
             model = EnhancedModel(4096, 5, 128, len(word2idx), 50, desired_learning_rate)
@@ -81,16 +82,8 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
 
 
     epochs = desired_epochs
-
-    # In order to speed up training, we have implemented a cut-off function that ends training
-    # so that we don't needlessly train our models wasting time or overfit the trainning data.
-    # due to our previous experieces with how our models perform and learn, plus or minus 2.5%
-    # accuracy for 4 epochs was deemed a platuea in minimizing loss
-
     print("---------------------------TRAIN-----------------------------")
-    # accuracy array
     acc = [0] * epochs
-    # count for a stable acccuracy
     stable_count = 0
     stable_accuracy = 0
     for i in range(epochs):
@@ -98,17 +91,19 @@ def main(desired_model, desired_learning_rate, desired_batch_size, desired_epoch
         print(f"---------------------------EPOCH {i}---------------------------")
         print(acc[i])
         print("-------------------------------------------------------------")
-
+        '''
+        In order to speed up training, we have implemented a cut-off function that ends training
+        so that we don't needlessly train our models wasting time or overfit the trainning data.
+        Due to our previous experieces with how our models perform and learn, plus or minus 2.5%
+        accuracy for 4 epochs was deemed a plateau in minimizing loss.
+        '''
         if(acc[i] < stable_accuracy + 2.5) and (acc[i] > stable_accuracy - 2.5):
             stable_count += 1
         else:
             stable_count = 0
             stable_accuracy = acc[i]
-
         if stable_count >= 4:
             break
-
-
     print("---------------------------TEST------------------------------")
     print(test(model, test_images, test_text, test_nums, test_views))
 
@@ -117,7 +112,7 @@ if __name__ == "__main__":
 
     n = len(sys.argv)
 
-    # default run
+    # default parameters
     if n == 1:
         desired_model = 'EnhancedModel'
         desired_learning_rate = 0.1

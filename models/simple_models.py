@@ -1,6 +1,8 @@
 import tensorflow as tf
 
+# SEED is initialized for deterministic results
 SEED = 0
+
 class ImageModel(tf.keras.Model):
 
     def __init__(self, hidden_size, filter_size, embed_size, vocab_size, window_size, desired_learning_rate):
